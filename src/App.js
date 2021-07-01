@@ -1,34 +1,55 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
+import { useForm } from "./useForm";
+import { Hello } from "./Hello";
 
 const App = () => {
-  const [{ count1 }, setCount1] = useState({ count1: 0 });
-  const [{ count2 }, setCount2] = useState({ count2: 0 });
+  //Hook into useForm custom hook and pass in initial values
+  const [values, handleChange] = useForm({
+    email: "",
+    password: "",
+    firstName: "",
+  });
+
+  //Hook sets state to allow Hello component to show or hide
+  const [showHello, setShowHello] = useState(true);
+
+  //Create reference to an input field (email)
+  const inputRef = useRef();
+
+  // Fires synchronously after useEffect, typically to get some info from the DOM after rendering
+  useLayoutEffect(() => {
+    //Gets email input dimensions
+    console.log(inputRef.current.getBoundingClientRect());
+  }, []);
 
   return (
     <div>
-      <div>count1: {count1}</div>
-      <div>count2: {count2}</div>
-      <button
-        onClick={() =>
-          setCount1((currentState) => ({
-            ...currentState,
-            count1: currentState.count1 + 1,
-          }))
-        }
-      >
-        Count1
-      </button>
-      <button
-        onClick={() =>
-          setCount2((currentState) => ({
-            ...currentState,
-            count2: currentState.count2 + 1,
-          }))
-        }
-      >
-        Count2
-      </button>
+      <button onClick={() => setShowHello(!showHello)}>Toggle</button>
+      {/* Render Hello component if showHello == true */}
+      {showHello && <Hello />}
+      <input
+        //Associate input with useRef hook
+        ref={inputRef}
+        name="email"
+        placeholder="email"
+        value={values.email}
+        onChange={handleChange}
+      />
+      <input
+        name="firstName"
+        placeholder="first name"
+        value={values.firstName}
+        onChange={handleChange}
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="password"
+        value={values.password}
+        onChange={handleChange}
+      />
+      <button onClick={() => inputRef.current.focus()}>focus on email!</button>
     </div>
   );
 };
